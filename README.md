@@ -1,8 +1,8 @@
-![image](https://dont-code.net/assets/logo-shadow-squared.png)
+![Image](https://dont-code.net/assets/logo-shadow-squared.png)
 ## What is it for ?
 
 These services store / load / list the data edited by users of a Dont-code application.
-They are part of the [dont-code](https://dont-code.net) no-code / low-code platform enabling you to quickly produce your very own application.
+They are part of the [Dont-code](https://dont-code.net) no-code / low-code platform enabling you to quickly produce your very own application.
 
 ## What is it ?
 These services are developed in [Quarkus](https://quarkus.io) and uses a [MongoDB](https://mongodb.com) database to store the data in json format.
