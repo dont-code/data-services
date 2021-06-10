@@ -34,11 +34,11 @@ public class DataResource {
     String dataDbName;
 
     @GET
-    @Path("/")
+    @Path("/{entityName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Multi<Document> listProjects (UriInfo info, @RestHeader("DbName") String dbName) {
+    public Multi<Document> listEntities (UriInfo info,@PathParam("entityName") String entityName, @RestHeader("DbName") String dbName) {
         log.debug("Hostname = {}, DbName Header = {}", info.getAbsolutePath(), dbName);
-        Multi<Document> ret = getProjects(dbName).find().map(document -> {
+        Multi<Document> ret = getEntities(entityName, dbName).find().map(document -> {
             changeIdToString(document);
             return document;
         });
@@ -46,11 +46,11 @@ public class DataResource {
     }
 
     @GET
-    @Path("/{projectName}")
+    @Path("/{entityName}/{entityId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Blocking
-    public Uni<Response> getProject (String projectName, @HeaderParam("DbName") String dbName) {
-        Uni<Response> ret = getProjects(dbName).find(new Document().append("name", projectName)).toUni().map(document -> {
+    public Uni<Response> getEntity (@PathParam("entityName") String entityName, @PathParam("entityId") String entityId,  @HeaderParam("DbName") String dbName) {
+        Uni<Response> ret = getEntities(entityName, dbName).find(new Document().append("_id", new ObjectId (entityId))).toUni().map(document -> {
            if( document != null) {
                changeIdToString(document);
                return Response.ok(document).build();
@@ -62,12 +62,12 @@ public class DataResource {
     }
 
     @PUT
-    @Path("/{projectName}")
+    @Path("/{entityName}/{entityId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> updateProject (String projectName, @HeaderParam("DbName") String dbName, Document body) {
+    public Uni<Response> updateProject (@PathParam("entityName") String entityName, @PathParam("entityId") String entityId, @HeaderParam("DbName") String dbName, Document body) {
         changeIdToObjectId(body);
-        Uni<Response> ret = getProjects(dbName).findOneAndReplace(new Document().append("_id", body.get("_id")), body).map(document -> {
+        Uni<Response> ret = getEntities(entityName, dbName).findOneAndReplace(new Document().append("_id", body.get("_id")), body).map(document -> {
             if( document != null) {
                 changeIdToString(document);
                 return Response.ok(document).build();
@@ -87,11 +87,11 @@ public class DataResource {
     }
 
     @DELETE
-    @Path("/{projectName}")
+    @Path("/{entityName}/{entityId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> deleteProject (String projectName, @HeaderParam("DbName") String dbName) {
-        Uni<Response> ret = getProjects(dbName).findOneAndDelete(new Document().append("name", projectName)).map(document -> {
+    public Uni<Response> deleteProject (@PathParam("entityName") String entityName, @PathParam("entityId") String entityId, @HeaderParam("DbName") String dbName) {
+        Uni<Response> ret = getEntities(entityName, dbName).findOneAndDelete(new Document().append("_id", new ObjectId(entityId))).map(document -> {
             if( document != null) {
                 changeIdToString(document);
                 return Response.ok(document).build();
@@ -103,31 +103,20 @@ public class DataResource {
     }
 
     @POST
-    @Path("/")
+    @Path("/{entityName}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> insertProject(Document body, @HeaderParam("DbName") String dbName) {
+    public Uni<Response> insertProject(Document body, @PathParam("entityName") String entityName, @HeaderParam("DbName") String dbName) {
         //System.out.println("Received"+ body);
-        return getProjects(dbName).insertOne(body).map(result -> {
+        return getEntities(entityName, dbName).insertOne(body).map(result -> {
             changeIdToString(body);
             return Response.ok(body).build();
         });
     }
 
-    protected ReactiveMongoCollection<Document> getProjects(String dbName) {
-        return getDatabase(dbName).getCollection("projects", Document.class);
+    protected ReactiveMongoCollection<Document> getEntities(String entity, String dbName) {
+        return getDatabase(dbName).getCollection(entity, Document.class);
     }
-
-    /*protected ReactiveMongoCollection<Document> getProjects() {
-        return getDatabase().getCollection("projects", Document.class);
-    }
-    protected <T> ReactiveMongoCollection<T> getProjects(Class<T> clazz) {
-        return getDatabase().getCollection("projects", clazz);
-    }
-
-    protected ReactiveMongoDatabase getDatabase () {
-        return mongoClient.getDatabase(projectDbName);
-    }*/
 
     protected ReactiveMongoDatabase getDatabase (String dbName) {
         if( dbName==null) dbName = dataDbName;

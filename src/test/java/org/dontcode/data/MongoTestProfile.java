@@ -1,4 +1,4 @@
-package org.dontcode.prj;
+package org.dontcode.data;
 
 import io.quarkus.test.junit.QuarkusTestProfile;
 
@@ -9,6 +9,6 @@ public class MongoTestProfile implements QuarkusTestProfile {
     @Override
     public Map<String, String> getConfigOverrides() {
         //System.out.println("Database is"+ EmbeddedMongoHelper.serverListening(2017));
-        return Map.of(/*"quarkus.mongodb.projects.connection-string","mongodb://localhost:27017",*/ "projects-database-name","unitTestProjectDb");
+        return Map.of(/*"quarkus.mongodb.projects.connection-string","mongodb://localhost:27017",*/ "data-database-name","unitTestDataDb");
     }
 }
