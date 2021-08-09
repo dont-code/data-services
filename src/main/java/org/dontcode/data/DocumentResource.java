@@ -17,6 +17,8 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 
 @Path("/documents")
@@ -42,7 +44,9 @@ public class DocumentResource {
         String filePath;
             for (FileUpload file : filesForm.files) {
                 filePath=file.uploadedFile().getFileName().toString()+'.'+file.contentType().substring(file.contentType().lastIndexOf('/')+1);
-                Files.copy(file.uploadedFile(), documentDir.resolve(filePath));
+                java.nio.file.Path destPath = documentDir.resolve(filePath);
+                Files.copy(file.uploadedFile(), destPath, StandardCopyOption.REPLACE_EXISTING);
+                Files.setPosixFilePermissions(destPath, PosixFilePermissions.fromString("rwxr-xr-x"));
                 resp.add(new UploadedDocumentInfo(file.fileName(), true, docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset())));
             }
             return Response.ok().entity(resp).build();
