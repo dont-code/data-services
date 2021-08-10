@@ -37,7 +37,7 @@ public class DocumentResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response receiveDocuments(FilesFormData filesForm) {
-
+        log.debug ("Receiving documents");
         ArrayList<UploadedDocumentInfo> resp = new ArrayList<UploadedDocumentInfo>();
         try {
         java.nio.file.Path documentDir = FileSystems.getDefault().getPath(docDir);
@@ -48,6 +48,7 @@ public class DocumentResource {
                 Files.copy(file.uploadedFile(), destPath, StandardCopyOption.REPLACE_EXISTING);
                 Files.setPosixFilePermissions(destPath, PosixFilePermissions.fromString("rwxr-xr-x"));
                 resp.add(new UploadedDocumentInfo(file.fileName(), true, docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset())));
+                log.debug ("Received document {} to url {}", file.fileName(), docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset()));
             }
             return Response.ok().entity(resp).build();
         } catch (Exception e) {
