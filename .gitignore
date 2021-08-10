@@ -5,6 +5,7 @@
 /target
 /tmp
 /out-tsc
+/scratch
 # Only exists if Bazel was run
 /bazel-out
 
