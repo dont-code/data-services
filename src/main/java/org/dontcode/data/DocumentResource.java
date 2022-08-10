@@ -47,8 +47,7 @@ public class DocumentResource {
                 filePath=file.uploadedFile().getFileName().toString()+'.'+file.contentType().substring(file.contentType().lastIndexOf('/')+1);
                 java.nio.file.Path destPath = documentDir.resolve(filePath);
                 log.info("Uploaded file is {}, exist ? {}, Dest path is {}", file.uploadedFile(), Files.exists(file.uploadedFile()), destPath);
-                Files.copy(file.uploadedFile(), documentDir, StandardCopyOption.REPLACE_EXISTING);
-                Files.move(documentDir.resolve(file.uploadedFile().getFileName()), destPath);
+                Files.copy(file.uploadedFile(), destPath, StandardCopyOption.REPLACE_EXISTING);
                 Files.setPosixFilePermissions(destPath, PosixFilePermissions.fromString("rwxr-xr-x"));
                 resp.add(new UploadedDocumentInfo(file.fileName(), true, docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset())));
                 log.debug ("Received document {} to url {}", file.fileName(), docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset()));
