@@ -41,11 +41,12 @@ public class DocumentResource {
         ArrayList<UploadedDocumentInfo> resp = new ArrayList<UploadedDocumentInfo>();
         try {
         java.nio.file.Path documentDir = FileSystems.getDefault().getPath(docDir);
+        log.info("Document path is {}, absolute path is {}, exist ? {}", documentDir, documentDir.toAbsolutePath(), Files.exists(documentDir));
         String filePath;
             for (FileUpload file : filesForm.files) {
                 filePath=file.uploadedFile().getFileName().toString()+'.'+file.contentType().substring(file.contentType().lastIndexOf('/')+1);
                 java.nio.file.Path destPath = documentDir.resolve(filePath);
-                Files.copy(file.uploadedFile(), destPath, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(file.uploadedFile().toAbsolutePath(), destPath, StandardCopyOption.REPLACE_EXISTING);
                 Files.setPosixFilePermissions(destPath, PosixFilePermissions.fromString("rwxr-xr-x"));
                 resp.add(new UploadedDocumentInfo(file.fileName(), true, docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset())));
                 log.debug ("Received document {} to url {}", file.fileName(), docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset()));
