@@ -41,6 +41,7 @@ public class DocumentResource {
         ArrayList<UploadedDocumentInfo> resp = new ArrayList<UploadedDocumentInfo>();
         try {
         java.nio.file.Path documentDir = FileSystems.getDefault().getPath(docDir);
+        Files.createDirectories(documentDir);
         String filePath;
             for (FileUpload file : filesForm.files) {
                 filePath=file.uploadedFile().getFileName().toString()+'.'+file.contentType().substring(file.contentType().lastIndexOf('/')+1);
