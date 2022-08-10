@@ -46,7 +46,6 @@ public class DocumentResource {
             for (FileUpload file : filesForm.files) {
                 filePath=file.uploadedFile().getFileName().toString()+'.'+file.contentType().substring(file.contentType().lastIndexOf('/')+1);
                 java.nio.file.Path destPath = documentDir.resolve(filePath);
-                log.info("Uploaded file is {}, exist ? {}, Dest path is {}", file.uploadedFile(), Files.exists(file.uploadedFile()), destPath);
                 Files.copy(file.uploadedFile(), destPath, StandardCopyOption.REPLACE_EXISTING);
                 Files.setPosixFilePermissions(destPath, PosixFilePermissions.fromString("rwxr-xr-x"));
                 resp.add(new UploadedDocumentInfo(file.fileName(), true, docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset())));
@@ -54,7 +53,6 @@ public class DocumentResource {
             }
             return Response.ok().entity(resp).build();
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("Error receiving documents {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.ordinal(), e.getMessage()).build();
         }
