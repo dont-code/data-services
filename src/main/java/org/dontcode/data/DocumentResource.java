@@ -52,6 +52,7 @@ public class DocumentResource {
             }
             return Response.ok().entity(resp).build();
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Error receiving documents {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.ordinal(), e.getMessage()).build();
         }
