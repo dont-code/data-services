@@ -1,4 +1,4 @@
-package org.dontcode.data;
+package net.dontcode.data;
 
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;

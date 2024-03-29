@@ -1,4 +1,4 @@
-package org.dontcode.data;
+package net.dontcode.data;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
