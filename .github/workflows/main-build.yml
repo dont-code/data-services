@@ -1,10 +1,9 @@
-name: Development Build
+name: Release
 
 on:
   push:
-    branches: [ Development ]
-  pull_request:
-    branches: [ Development ]
+    branches: [ main ]
+
 jobs:
   build:
 
@@ -20,7 +19,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        ref: Development
+        ref: main
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
@@ -36,7 +35,18 @@ jobs:
       with:
         name: _TEST_QUARKUS_MONGODB_PROJECTS_CONNECTION_STRING
         value: "mongodb://localhost:27017"
-    - name: Build with Maven
+    - name: override Mongo connection url
+      uses: myci-actions/export-env-var@1
+      with:
+        name: _TEST_QUARKUS_MONGODB_PROJECTS_CONNECTION_STRING
+        value: "mongodb://localhost:27017"
+    - name: Build
       run: |
-        mkdir scratch
+        mkdir ./scratch
         mvn -B package --file pom.xml
+    - uses: actions/upload-artifact@v4
+        # Test run screenshots only on failure
+      if: success()
+      with:
+        name: data-services-runner.jar
+        path: target/data-services-runner.jar
