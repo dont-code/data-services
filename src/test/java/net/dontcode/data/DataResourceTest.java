@@ -1,4 +1,4 @@
-package org.dontcode.data;
+package net.dontcode.data;
 
 import io.quarkus.mongodb.MongoClientName;
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
@@ -13,7 +13,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static io.restassured.RestAssured.given;
 
 @QuarkusTest
-@TestHTTPEndpoint(org.dontcode.data.DataResource.class)
+@TestHTTPEndpoint(DataResource.class)
 @TestProfile(MongoTestProfile.class)
 public class DataResourceTest {
 

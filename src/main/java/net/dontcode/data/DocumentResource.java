@@ -1,4 +1,4 @@
-package org.dontcode.data;
+package net.dontcode.data;
 
 import net.dontcode.core.store.UploadedDocumentInfo;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -6,13 +6,13 @@ import org.jboss.resteasy.reactive.multipart.FileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
@@ -46,7 +46,6 @@ public class DocumentResource {
             for (FileUpload file : filesForm.files) {
                 filePath=file.uploadedFile().getFileName().toString()+'.'+file.contentType().substring(file.contentType().lastIndexOf('/')+1);
                 java.nio.file.Path destPath = documentDir.resolve(filePath);
-                log.info("Uploaded file is {}, exist ? {}, Dest path is {}", file.uploadedFile(), Files.exists(file.uploadedFile()), destPath);
                 Files.copy(file.uploadedFile(), destPath, StandardCopyOption.REPLACE_EXISTING);
                 Files.setPosixFilePermissions(destPath, PosixFilePermissions.fromString("rwxr-xr-x"));
                 resp.add(new UploadedDocumentInfo(file.fileName(), true, docExternalUrl+'/'+ URLEncoder.encode( filePath, Charset.defaultCharset())));
@@ -54,7 +53,6 @@ public class DocumentResource {
             }
             return Response.ok().entity(resp).build();
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("Error receiving documents {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.ordinal(), e.getMessage()).build();
         }
