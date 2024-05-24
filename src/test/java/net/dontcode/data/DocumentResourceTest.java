@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
 @TestHTTPEndpoint(DocumentResource.class)
@@ -23,7 +24,8 @@ public class DocumentResourceTest {
         given().contentType(ContentType.MULTIPART).accept(ContentType.JSON)
                 .multiPart("file#1", "document1.pdf", file1Content.getBytes(StandardCharsets.UTF_8),"application/pdf")
                 .multiPart("file#2", "document2.png", file2Content.getBytes(StandardCharsets.UTF_8),"image/png")
-                .when().post().then().statusCode(HttpStatus.SC_OK);
+                .when().post().then().statusCode(HttpStatus.SC_OK)
+                .and ().body("size()", is (2));
 
     }
 
