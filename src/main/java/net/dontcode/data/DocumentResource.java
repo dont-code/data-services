@@ -2,6 +2,7 @@ package net.dontcode.data;
 
 import net.dontcode.core.store.UploadedDocumentInfo;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
+import java.util.List;
 
 @Path("/documents")
 @ApplicationScoped
@@ -36,14 +38,14 @@ public class DocumentResource {
     @Path("/")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response receiveDocuments(FilesFormData filesForm) {
+    public Response receiveDocuments(@RestForm(FileUpload.ALL) List<FileUpload> filesForm) {
         log.debug ("Receiving documents");
         ArrayList<UploadedDocumentInfo> resp = new ArrayList<UploadedDocumentInfo>();
         try {
         java.nio.file.Path documentDir = FileSystems.getDefault().getPath(docDir);
         Files.createDirectories(documentDir);
         String filePath;
-            for (FileUpload file : filesForm.files) {
+            for (FileUpload file : filesForm) {
                 filePath=file.uploadedFile().getFileName().toString()+'.'+file.contentType().substring(file.contentType().lastIndexOf('/')+1);
                 java.nio.file.Path destPath = documentDir.resolve(filePath);
                 Files.copy(file.uploadedFile(), destPath, StandardCopyOption.REPLACE_EXISTING);
