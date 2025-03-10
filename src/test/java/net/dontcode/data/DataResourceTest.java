@@ -36,18 +36,18 @@ public class DataResourceTest {
         Document doc = new Document();
         AtomicReference<Throwable> error = new AtomicReference<>();
 
-        doc.append("name","TestProject1").append("creation", new Date());
+        doc.append("name","TestData1").append("creation", new Date());
         removeEntities(entityName);
         removeEntities(otherEntityName);
         getEntities(entityName).insertOne(doc).onFailure().invoke(throwable -> {
             error.set(throwable);
         }).await().atMost(Duration.ofSeconds(10));
-        doc.put("name","TestProject2");
+        doc.put("name","TestData2");
         doc.remove("_id");
         getEntities(entityName).insertOne(doc).onFailure().invoke(throwable -> {
             error.set(throwable);
         }).await().atMost(Duration.ofSeconds(10));
-        doc.put("name","OtherTestProject");
+        doc.put("name","OtherData");
         doc.remove("_id");
         getEntities(otherEntityName).insertOne(doc).onFailure().invoke(throwable -> {
             error.set(throwable);
@@ -58,10 +58,10 @@ public class DataResourceTest {
 
         Assertions.assertNull(isError, "Error writing test data to Mongo "+errorMessage);
         given().accept(ContentType.JSON).when().get("/{entityName}",entityName).then().statusCode(HttpStatus.SC_OK)
-                .body("[0].name", Matchers.equalTo("TestProject1")).body( "[1].name", Matchers.equalTo("TestProject2") );
+                .body("[0].name", Matchers.equalTo("TestData1")).body( "[1].name", Matchers.equalTo("TestData2") );
 
         given().accept(ContentType.JSON).when().get("/{entityName}",otherEntityName).then().statusCode(HttpStatus.SC_OK)
-                .body("[0].name", Matchers.equalTo("OtherTestProject") );
+                .body("[0].name", Matchers.equalTo("OtherData") );
     }
 
     @Test
@@ -70,7 +70,7 @@ public class DataResourceTest {
 
         removeEntities(entityName);
         Document resp = given().contentType(ContentType.JSON).accept(ContentType.JSON).body("{" +
-                "\"name\":\"PrjCreated1\"," +
+                "\"name\":\"DataCreated1\"," +
                 "\"creation\":\"2021-03-04\"" +
                 "}").when().post("/{entityName}", entityName).then().statusCode(HttpStatus.SC_OK)
                 .body("_id", Matchers.notNullValue() )
@@ -78,7 +78,7 @@ public class DataResourceTest {
 
 
         given().accept(ContentType.JSON).when().get("/{entityName}/{entityId}",entityName, resp.get("_id").toString()).then().statusCode(HttpStatus.SC_OK)
-                .body("name", Matchers.is("PrjCreated1"));
+                .body("name", Matchers.is("DataCreated1"));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class DataResourceTest {
 
         removeEntities(entityName);
         Document created = given().contentType(ContentType.JSON).accept(ContentType.JSON).body("{" +
-                "\"name\":\"PrjCreated2\"," +
+                "\"name\":\"DataCreated2\"," +
                 "\"creation\":\"2021-05-05\"" +
                 "}").when().post("/{entityName}", entityName).then().statusCode(HttpStatus.SC_OK)
                 .body("_id", Matchers.notNullValue() )
@@ -102,19 +102,20 @@ public class DataResourceTest {
         String entityId = created.get("_id").toString();
 
         given().accept(ContentType.JSON).when().get("/{entityName}/{entityId}", entityName, entityId).then().statusCode(HttpStatus.SC_OK)
-                .body("name", Matchers.is("PrjCreated2"));
+                .body("name", Matchers.is("DataCreated2"));
 
         Document updated = given().contentType(ContentType.JSON).accept(ContentType.JSON).body("{" +
                 "\"_id\":\""+entityId+"\","+
-                "\"name\":\"PrjUpdated2\"," +
+                "\"name\":\"DataUpdated2\"," +
                 "\"creation\":\"2021-06-07\"" +
                 "}").when().put("/{entityName}/{entityId}",entityName, entityId).then().statusCode(HttpStatus.SC_OK)
                 .body("_id", Matchers.notNullValue() )
                 .and().extract().as(Document.class);
         Assertions.assertEquals(entityId, updated.get("_id").toString());
+        Assertions.assertEquals("DataUpdated2", updated.get("name"));
 
         given().accept(ContentType.JSON).when().get("/{entityName}/{entityId}",entityName, entityId).then().statusCode(HttpStatus.SC_OK)
-                .body("name", Matchers.is("PrjUpdated2"))
+                .body("name", Matchers.is("DataUpdated2"))
                 .body("_id", Matchers.equalTo(created.get("_id")));
 
         given().accept(ContentType.JSON).when().delete("/{entityName}/{entityId}",entityName, entityId).then().statusCode(HttpStatus.SC_OK);
