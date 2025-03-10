@@ -1,5 +1,7 @@
 package net.dontcode.data;
 
+import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.ReturnDocument;
 import io.quarkus.mongodb.MongoClientName;
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
@@ -65,9 +67,9 @@ public class DataResource {
     @Path("/{entityName}/{entityId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> updateProject (@PathParam("entityName") String entityName, @PathParam("entityId") String entityId, @HeaderParam("DbName") String dbName, Document body) {
+    public Uni<Response> replaceEntity (@PathParam("entityName") String entityName, @PathParam("entityId") String entityId, @HeaderParam("DbName") String dbName, Document body) {
         changeIdToObjectId(body);
-        Uni<Response> ret = getEntities(entityName, dbName).findOneAndReplace(new Document().append("_id", body.get("_id")), body).map(document -> {
+        Uni<Response> ret = getEntities(entityName, dbName).findOneAndReplace(new Document().append("_id", body.get("_id")), body, new FindOneAndReplaceOptions().upsert(false).returnDocument(ReturnDocument.AFTER)).map(document -> {
             if( document != null) {
                 changeIdToString(document);
                 return Response.ok(document).build();
@@ -90,7 +92,7 @@ public class DataResource {
     @Path("/{entityName}/{entityId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> deleteProject (@PathParam("entityName") String entityName, @PathParam("entityId") String entityId, @HeaderParam("DbName") String dbName) {
+    public Uni<Response> deleteEntity (@PathParam("entityName") String entityName, @PathParam("entityId") String entityId, @HeaderParam("DbName") String dbName) {
         Uni<Response> ret = getEntities(entityName, dbName).findOneAndDelete(new Document().append("_id", new ObjectId(entityId))).map(document -> {
             if( document != null) {
                 changeIdToString(document);
@@ -106,7 +108,7 @@ public class DataResource {
     @Path("/{entityName}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> insertProject(Document body, @PathParam("entityName") String entityName, @HeaderParam("DbName") String dbName) {
+    public Uni<Response> insertEntity(Document body, @PathParam("entityName") String entityName, @HeaderParam("DbName") String dbName) {
         //System.out.println("Received"+ body);
         return getEntities(entityName, dbName).insertOne(body).map(result -> {
             changeIdToString(body);
