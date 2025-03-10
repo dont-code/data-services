@@ -102,7 +102,7 @@ public class DataResourceTest {
         String entityId = created.get("_id").toString();
 
         given().accept(ContentType.JSON).when().get("/{entityName}/{entityId}", entityName, entityId).then().statusCode(HttpStatus.SC_OK)
-                .body("name", Matchers.is("PrjCreated2"));
+                .body("name", Matchers.is("DataCreated2"));
 
         Document updated = given().contentType(ContentType.JSON).accept(ContentType.JSON).body("{" +
                 "\"_id\":\""+entityId+"\","+
